@@ -33,12 +33,12 @@ func GetUsers(ids []string) map[string]User {
 
 // SaveUsers to disc
 func SaveUsers() {
-	storeJSON(Users, "../config/user_data")
+	storeJSON(Users, "config/user_data")
 }
 
 // LoadUsers from disc or create new user DB
 func LoadUsers() {
-	err := loadJSON(&Users, "../config/user_data")
+	err := loadJSON(&Users, "config/user_data")
 	if err != nil {
 		fmt.Println("Creating new User DB")
 		Users = make(map[string]User)
