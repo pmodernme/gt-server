@@ -49,6 +49,7 @@ func putUser(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
 		http.Error(w, http.StatusText(400), 400)
+		return
 	}
 
 	model.Users[u.ID] = u
