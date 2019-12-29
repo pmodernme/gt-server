@@ -1,27 +1,25 @@
 package model
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
-	// Autoload .env variables
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/jinzhu/gorm"
+	_ "github.com/joho/godotenv/autoload" // Autoload .env variables
 	_ "github.com/lib/pq"
 )
 
-var db *sql.DB
+var DB *gorm.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("postgres", os.Getenv("POSTGRES_CONNECTION"))
+	DB, err = gorm.Open("postgres", os.Getenv("POSTGRES_CONNECTION"))
 	if err != nil {
 		log.Fatalln("Error opening postgres datastore.", err)
 	}
 
-	if err = db.Ping(); err != nil {
-		log.Fatalln("Could not connect to server.", err)
-	}
+	DB.AutoMigrate(&User{}, &Credentials{})
+
 	fmt.Println("Database connected.")
 }
