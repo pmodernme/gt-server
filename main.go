@@ -1,14 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
 	"./API"
 	"github.com/joho/godotenv"
-
-	"./model"
 )
 
 func init() {
@@ -16,11 +13,10 @@ func init() {
 	if err != nil {
 		log.Fatalln("Error loading .env file.", err)
 	}
-
-	model.InitDB()
 }
 
 func main() {
+	http.Handle("/", API.Handlers())
 	log.Printf("API listening on port %s", API.Port)
-	http.ListenAndServe(fmt.Sprintf(":%s", API.Port), API.Mux())
+	log.Fatal(http.ListenAndServe(":"+API.Port, nil))
 }
