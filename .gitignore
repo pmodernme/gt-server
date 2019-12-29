@@ -16,3 +16,9 @@
 
 # Config Folder
 config/
+
+# Environment Variables
+.env
+
+# Mac OS
+.DS_Store

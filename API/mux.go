@@ -4,9 +4,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
-// Port for the api to serve from
 var Port string
 
 func init() {
@@ -20,6 +21,6 @@ func init() {
 // Mux for the API
 func Mux() *http.ServeMux {
 	m := http.NewServeMux()
-	m.HandleFunc("/users", users)
+	m.HandleFunc("/signup", Signup)
 	return m
 }

@@ -1,71 +1,26 @@
 package model
 
 import (
-	"encoding/json"
+	"database/sql"
 	"fmt"
+	"log"
 	"os"
+
+	_ "github.com/joho/godotenv/autoload"
+	_ "github.com/lib/pq"
 )
 
-// Users by ID
-var Users map[string]User
+var db *sql.DB
 
-func init() {
-	LoadUsers()
-}
-
-// AllUsers as a slice
-func AllUsers() []User {
-	us := make([]User, 0)
-	for _, u := range Users {
-		us = append(us, u)
-	}
-	return us
-}
-
-// GetUsers in a slice of ids
-func GetUsers(ids []string) map[string]User {
-	us := make(map[string]User, 0)
-	for _, id := range ids {
-		us[id] = Users[id]
-	}
-	return us
-}
-
-// SaveUsers to disc
-func SaveUsers() {
-	storeJSON(Users, "config/user_data")
-}
-
-// LoadUsers from disc or create new user DB
-func LoadUsers() {
-	err := loadJSON(&Users, "config/user_data")
+func InitDB() {
+	var err error
+	db, err = sql.Open("postgres", os.Getenv("POSTGRES_CONNECTION"))
 	if err != nil {
-		fmt.Println("Creating new User DB")
-		Users = make(map[string]User)
-	}
-}
-
-func storeJSON(j interface{}, fn string) {
-	f, err := os.Create(fn)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer f.Close()
-
-	json.NewEncoder(f).Encode(j)
-}
-
-func loadJSON(j interface{}, fn string) error {
-	f, err := os.Open(fn)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	err = json.NewDecoder(f).Decode(&j)
-	if err != nil {
-		return err
+		log.Fatalln("Error opening postgres datastore.", err)
 	}
 
-	return nil
+	if err = db.Ping(); err != nil {
+		log.Fatalln("Could not connect to server.", err)
+	}
+	fmt.Println("Database connected.")
 }
