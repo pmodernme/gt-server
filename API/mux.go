@@ -26,11 +26,12 @@ func Handlers() *mux.Router {
 	r := mux.NewRouter().StrictSlash(true)
 	r.Use(CommonMiddleware)
 
-	r.HandleFunc("/signup", Signup)
-	r.HandleFunc("/signin", Signin)
+	r.HandleFunc("/signup", Signup).Methods("POST")
+	r.HandleFunc("/signin", Signin).Methods("POST")
 
 	s := r.PathPrefix("/auth").Subrouter()
 	s.Use(auth.JwtVerify)
+	s.HandleFunc("/test", TestAuth).Methods("GET")
 
 	return r
 }

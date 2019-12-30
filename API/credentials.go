@@ -55,3 +55,7 @@ func decodeCredentials(w http.ResponseWriter, r *http.Request) *model.Credential
 	}
 	return creds
 }
+
+func TestAuth(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode("It worked!")
+}
