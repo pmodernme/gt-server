@@ -22,7 +22,11 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 }
 
 // Signin - API endpoint for signing in a user
+<<<<<<< HEAD
 // Success writes a JSON body including the username and a token
+=======
+// Success write a JSON body including the username and a token
+>>>>>>> 9ac2288bd9efeaffa19338ba39c6363c7cda8d29
 func Signin(w http.ResponseWriter, r *http.Request) {
 	creds := decodeCredentials(w, r)
 
