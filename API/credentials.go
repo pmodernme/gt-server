@@ -10,6 +10,8 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+// Signup - API endpoint for signing up a new user
+// Status 200 indicates success
 func Signup(w http.ResponseWriter, r *http.Request) {
 	creds := decodeCredentials(w, r)
 	if err := model.Signup(creds); err != nil {
@@ -19,6 +21,8 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Signin - API endpoint for signing in a user
+// Success writes a JSON body including the username and a token
 func Signin(w http.ResponseWriter, r *http.Request) {
 	creds := decodeCredentials(w, r)
 
@@ -78,6 +82,7 @@ func writeError(w http.ResponseWriter, code int, message string) {
 	})
 }
 
+// TestAuth -
 func TestAuth(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("It worked!")
 }

@@ -7,16 +7,23 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Credentials - stored in SQL
 type Credentials struct {
 	gorm.Model
-	Password string `json:"password"`
+	Password string `json:"password"` //bcrypt hash, not actual password
 	Username string `gorm:"unique_index" json:"username"`
 }
 
+// ErrUnknownUser - The error returned if the username is incorrect
 var ErrUnknownUser = errors.New("model: no user exists with that username")
+
+// ErrIncorrectPassword - The error return if the password is incorrect
 var ErrIncorrectPassword = errors.New("model: incorrect password for user")
+
+// ErrInternal - The error returned if the fault of the error is in code
 var ErrInternal = errors.New("model: internal error")
 
+// Signup - returns nil if successful, an error if not
 func Signup(creds *Credentials) error {
 	pass, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -24,6 +31,9 @@ func Signup(creds *Credentials) error {
 	}
 
 	creds.Password = string(pass)
+
+	openDB()
+	defer DB.Close()
 
 	newCreds := DB.Create(creds)
 	if newCreds.Error != nil {
@@ -36,6 +46,10 @@ func Signup(creds *Credentials) error {
 // Signin - Returns the UserID or an Error
 func Signin(creds *Credentials) (uint, error) {
 	result := &Credentials{}
+
+	openDB()
+	defer DB.Close()
+
 	if err := DB.Where("username = ?", creds.Username).First(result).Error; err != nil {
 		return 0, ErrUnknownUser
 	}
