@@ -2,9 +2,7 @@ package model
 
 import (
 	"errors"
-	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -35,30 +33,17 @@ func Signup(creds *Credentials) error {
 	return nil
 }
 
-func Signin(creds *Credentials) (string, error) {
+// Signin - Returns the UserID or an Error
+func Signin(creds *Credentials) (uint, error) {
 	result := &Credentials{}
 	if err := DB.Where("username = ?", creds.Username).First(result).Error; err != nil {
-		return "", ErrUnknownUser
+		return 0, ErrUnknownUser
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(creds.Password))
 	if err != nil {
-		return "", ErrIncorrectPassword
+		return 0, ErrIncorrectPassword
 	}
 
-	expiration := time.Now().Add(time.Minute * 100000).Unix()
-	tk := &Token{
-		UserID: result.ID,
-		StandardClaims: &jwt.StandardClaims{
-			ExpiresAt: expiration,
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-	tokenString, err := token.SignedString([]byte("secret"))
-	if err != nil {
-		return "", ErrInternal
-	}
-
-	return tokenString, nil
+	return result.ID, nil
 }

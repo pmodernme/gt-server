@@ -19,7 +19,7 @@ func init() {
 func main() {
 	defer model.DB.Close()
 
-	http.Handle("/", API.Handlers())
+	http.Handle("/", API.Routes())
 	log.Printf("API listening on port %s", API.Port)
 	log.Fatal(http.ListenAndServe(":"+API.Port, nil))
 }

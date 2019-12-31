@@ -22,7 +22,8 @@ func init() {
 	}
 }
 
-func Handlers() *mux.Router {
+// Routes - s handles routes that require authentication
+func Routes() *mux.Router {
 	r := mux.NewRouter().StrictSlash(true)
 	r.Use(CommonMiddleware)
 
@@ -36,6 +37,7 @@ func Handlers() *mux.Router {
 	return r
 }
 
+// CommonMiddleware - Adds JSON headers
 func CommonMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
