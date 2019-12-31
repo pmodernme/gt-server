@@ -10,16 +10,22 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// DB - The primary model database
 var DB *gorm.DB
 
 func init() {
+	openDB()
+	defer DB.Close()
+
+	DB.AutoMigrate(&User{}, &Credentials{})
+
+	fmt.Println("Database connected.")
+}
+
+func openDB() {
 	var err error
 	DB, err = gorm.Open("postgres", os.Getenv("POSTGRES_CONNECTION"))
 	if err != nil {
 		log.Fatalln("Error opening postgres datastore.", err)
 	}
-
-	DB.AutoMigrate(&User{}, &Credentials{})
-
-	fmt.Println("Database connected.")
 }
