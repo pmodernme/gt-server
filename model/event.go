@@ -1,6 +1,8 @@
 package model
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -35,10 +37,20 @@ func DeleteEvent(e *Event) {
 	DB.Where("ID = ?", e.ID).Find(e).Delete(e)
 }
 
-func UpdateEvent(e *Event) {
+func UpdateEvent(updates map[string]interface{}) (Event, error) {
 	openDB()
 	defer DB.Close()
 
+	id, ok := updates["ID"].(float64)
+	if !ok {
+		return Event{}, fmt.Errorf("Invalid ID: %d", uint(id))
+	}
+
 	var event Event
-	DB.Where("ID = ?", e.ID).Find(&event).Update(&e)
+	DB.Unscoped().
+		Where("ID = ?", uint(id)).
+		Find(&event).
+		Update(updates)
+
+	return event, nil
 }

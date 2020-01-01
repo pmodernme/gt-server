@@ -34,9 +34,13 @@ func DeleteEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateEvent(w http.ResponseWriter, r *http.Request) {
-	e := model.Event{}
-	decode(&e, w, r)
-	model.UpdateEvent(&e)
+	updates := map[string]interface{}{}
+	decode(&updates, w, r)
+	e, err := model.UpdateEvent(updates)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "Bad Request")
+		return
+	}
 
 	send(map[string]interface{}{"event": e}, true, "Event Updated", w)
 }
