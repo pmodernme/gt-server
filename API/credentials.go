@@ -1,8 +1,6 @@
 package API
 
 import (
-	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
@@ -13,18 +11,18 @@ import (
 // Signup - API endpoint for signing up a new user
 // Status 200 indicates success
 func Signup(w http.ResponseWriter, r *http.Request) {
-	creds := decodeCredentials(w, r)
+	var creds *model.Credentials
+	decode(creds, w, r)
 	if err := model.Signup(creds); err != nil {
-		var resp = map[string]interface{}{"status": false, "message": err.Error()}
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(resp)
+		writeError(w, http.StatusInternalServerError, err.Error())
 	}
 }
 
 // Signin - API endpoint for signing in a user
 // Success writes a JSON body including the username and a token
 func Signin(w http.ResponseWriter, r *http.Request) {
-	creds := decodeCredentials(w, r)
+	creds := &model.Credentials{}
+	decode(creds, w, r)
 
 	userID, err := model.Signin(creds)
 	if err != nil {
@@ -55,34 +53,8 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "Error creating Token")
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"status":  false,
-		"message": "logged in",
-		"token":   tokenString,
-		"user":    creds.Username,
-	})
-}
-
-func decodeCredentials(w http.ResponseWriter, r *http.Request) *model.Credentials {
-	creds := &model.Credentials{}
-	err := json.NewDecoder(r.Body).Decode(creds)
-	if err != nil {
-		log.Println("Bad Request:", r)
-		w.WriteHeader(http.StatusBadRequest)
-		return nil
-	}
-	return creds
-}
-
-func writeError(w http.ResponseWriter, code int, message string) {
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"status":  false,
-		"message": message,
-	})
-}
-
-// TestAuth -
-func TestAuth(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode("It worked!")
+	send(map[string]interface{}{
+		"token": tokenString,
+		"user":  creds.Username,
+	}, true, "logged in successfully", w)
 }

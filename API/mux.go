@@ -30,9 +30,13 @@ func Routes() *mux.Router {
 	r.HandleFunc("/signup", Signup).Methods("POST")
 	r.HandleFunc("/signin", Signin).Methods("POST")
 
+	r.HandleFunc("/events", AllEvents).Methods("GET")
+	r.HandleFunc("/events", NewEvent).Methods("POST")
+	r.HandleFunc("/events", DeleteEvent).Methods("DELETE")
+	r.HandleFunc("/events", UpdateEvent).Methods("PUT")
+
 	s := r.PathPrefix("/auth").Subrouter()
 	s.Use(auth.JwtVerify)
-	s.HandleFunc("/test", TestAuth).Methods("GET")
 
 	return r
 }
