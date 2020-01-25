@@ -41,3 +41,8 @@ func JwtVerify(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
+
+// Test - returns response code 418 (Teapot) if good
+func Test(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusTeapot)
+}
