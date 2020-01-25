@@ -17,7 +17,7 @@ func init() {
 	openDB()
 	defer DB.Close()
 
-	DB.AutoMigrate(&User{}, &Credentials{}, &Event{})
+	DB.AutoMigrate(&Profile{}, &Credentials{}, &Event{})
 
 	fmt.Println("Database connected.")
 }

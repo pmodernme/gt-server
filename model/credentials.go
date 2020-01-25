@@ -61,3 +61,12 @@ func Signin(creds *Credentials) (uint, error) {
 
 	return result.ID, nil
 }
+
+// Validate - Return false if credentails are invalid
+func Validate(creds *Credentials) bool {
+	if creds == nil || creds.Username == "" || creds.Password == "" {
+		return false
+	}
+
+	return true
+}

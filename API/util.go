@@ -6,10 +6,7 @@ import (
 )
 
 func decode(obj interface{}, w http.ResponseWriter, r *http.Request) {
-	err := json.NewDecoder(r.Body).Decode(&obj)
-	if err != nil {
-		writeError(w, http.StatusBadRequest, "Error decoding json object")
-	}
+	json.NewDecoder(r.Body).Decode(obj)
 }
 
 func writeError(w http.ResponseWriter, code int, message string) {

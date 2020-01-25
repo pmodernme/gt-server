@@ -11,9 +11,15 @@ import (
 // Signup - API endpoint for signing up a new user
 // Status 200 indicates success
 func Signup(w http.ResponseWriter, r *http.Request) {
-	var creds *model.Credentials
-	decode(creds, w, r)
-	if err := model.Signup(creds); err != nil {
+	var creds model.Credentials
+
+	decode(&creds, w, r)
+
+	if !model.Validate(&creds) {
+		writeError(w, http.StatusBadRequest, "Credentials could not be parsed")
+		return
+	}
+	if err := model.Signup(&creds); err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 	}
 }
