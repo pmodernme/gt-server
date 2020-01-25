@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 
@@ -45,4 +46,12 @@ func JwtVerify(next http.Handler) http.Handler {
 // Test - returns response code 418 (Teapot) if good
 func Test(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTeapot)
+
+	tk := r.Context().Value(Key("user")).(*model.Token)
+	creds, err := model.GetCredsFromID(tk.UserID)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Println(creds.Username)
 }

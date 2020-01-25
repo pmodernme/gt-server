@@ -62,6 +62,19 @@ func Signin(creds *Credentials) (uint, error) {
 	return result.ID, nil
 }
 
+func GetCredsFromID(uid uint) (*Credentials, error) {
+	creds := &Credentials{}
+
+	openDB()
+	defer DB.Close()
+
+	if err := DB.Where("ID = ?", uid).First(creds).Error; err != nil {
+		return nil, ErrUnknownUser
+	}
+
+	return creds, nil
+}
+
 // Validate - Return false if credentails are invalid
 func Validate(creds *Credentials) bool {
 	if creds == nil || creds.Username == "" || creds.Password == "" {

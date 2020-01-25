@@ -10,7 +10,10 @@ import (
 func AllEvents(w http.ResponseWriter, r *http.Request) {
 	events := model.AllEvents()
 	send(
-		map[string]interface{}{"events": events}, true, "Data found", w)
+		map[string]interface{}{"events": events},
+		true,
+		"Data found",
+		w)
 }
 
 func NewEvent(w http.ResponseWriter, r *http.Request) {
