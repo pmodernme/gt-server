@@ -30,7 +30,7 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 	creds := &model.Credentials{}
 	decode(creds, w, r)
 
-	userID, err := model.Signin(creds)
+	_, err := model.Signin(creds)
 	if err != nil {
 		var code int
 		switch err {
@@ -47,7 +47,7 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 
 	expiration := time.Now().Add(time.Minute * 100000).Unix()
 	tk := &model.Token{
-		UserID: userID,
+		Username: creds.Username,
 		StandardClaims: &jwt.StandardClaims{
 			ExpiresAt: expiration,
 		},

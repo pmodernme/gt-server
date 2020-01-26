@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 	"encoding/json"
-	"log"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -46,12 +46,13 @@ func JwtVerify(next http.Handler) http.Handler {
 // Test - returns response code 418 (Teapot) if good
 func Test(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTeapot)
+}
 
-	tk := r.Context().Value(Key("user")).(*model.Token)
-	creds, err := model.GetCredsFromID(tk.UserID)
-	if err != nil {
-		log.Fatalln(err)
+// GetUsername - returns the current username or an error if the token in invalid
+func GetUsername(r *http.Request) (string, error) {
+	if tk, ok := r.Context().Value(Key("user")).(*model.Token); ok && tk.Username != "" {
+		return tk.Username, nil
 	}
 
-	log.Println(creds.Username)
+	return "", errors.New("Invalid Token")
 }

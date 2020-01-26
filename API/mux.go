@@ -35,7 +35,7 @@ func Routes() *mux.Router {
 
 	s.HandleFunc("/test", auth.Test).Methods("GET")
 
-	s.HandleFunc("/events", AllEvents).Methods("GET")
+	s.HandleFunc("/events", GetEvents).Methods("GET")
 	s.HandleFunc("/events", NewEvent).Methods("POST")
 	s.HandleFunc("/events", DeleteEvent).Methods("DELETE")
 	s.HandleFunc("/events", UpdateEvent).Methods("PUT")

@@ -3,12 +3,31 @@ package API
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
+	"../auth"
 	"../model"
 )
 
+func GetEvents(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	if _, ok := q["id"]; ok {
+		FindEvent(w, r)
+	} else if _, ok := q["code"]; ok {
+
+	} else {
+		AllEvents(w, r)
+	}
+}
+
 func AllEvents(w http.ResponseWriter, r *http.Request) {
-	events := model.AllEvents()
+	username, err := auth.GetUsername(r)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "Invalid Token")
+		return
+	}
+
+	events := model.AllEvents(username)
 	send(
 		map[string]interface{}{"events": events},
 		true,
@@ -16,9 +35,50 @@ func AllEvents(w http.ResponseWriter, r *http.Request) {
 		w)
 }
 
+func FindEvent(w http.ResponseWriter, r *http.Request) {
+	username, err := auth.GetUsername(r)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "Invalid Token")
+		return
+	}
+
+	q := r.URL.Query()
+	sid, ok := q["id"]
+	if !ok {
+		writeError(w, http.StatusBadRequest, "Invalid Request")
+		return
+	}
+
+	id, err := strconv.ParseUint(sid[0], 10, 8)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "Invalid Query Parameters")
+		return
+	}
+
+	event, err := model.FindEvent(uint(id), username)
+	if err != nil {
+		writeError(w, http.StatusNotFound, fmt.Sprintf("Could not find event with ID: %d", id))
+		return
+	}
+
+	send(
+		map[string]interface{}{"event": event},
+		true,
+		fmt.Sprintln("Event", event.ID, "has been found successfully"),
+		w)
+}
+
 func NewEvent(w http.ResponseWriter, r *http.Request) {
+	username, err := auth.GetUsername(r)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "Invalid Token")
+		return
+	}
+
 	event := &model.Event{}
 	decode(event, w, r)
+	event.Creator = username
+
 	model.NewEvent(event)
 
 	send(
@@ -29,8 +89,15 @@ func NewEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteEvent(w http.ResponseWriter, r *http.Request) {
+	username, err := auth.GetUsername(r)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "Invalid Token")
+		return
+	}
+
 	event := &model.Event{}
 	decode(event, w, r)
+	event.Creator = username
 	model.DeleteEvent(event)
 
 	send(map[string]interface{}{"event": event}, true, "Event Deleted", w)
