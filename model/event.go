@@ -11,7 +11,7 @@ type Event struct {
 	gorm.Model
 	Code     string `json:"code" sql:"index"`
 	Incoming bool   `json:"incoming"`
-	Creator  string
+	Creator  string `sql:"index"`
 }
 
 func AllEvents(creator string) []Event {

@@ -14,7 +14,7 @@ func GetEvents(w http.ResponseWriter, r *http.Request) {
 	if _, ok := q["id"]; ok {
 		FindEvent(w, r)
 	} else if _, ok := q["code"]; ok {
-
+		FindEvents(w, r)
 	} else {
 		AllEvents(w, r)
 	}
@@ -64,7 +64,39 @@ func FindEvent(w http.ResponseWriter, r *http.Request) {
 	send(
 		map[string]interface{}{"event": event},
 		true,
-		fmt.Sprintln("Event", event.ID, "has been found successfully"),
+		fmt.Sprint("Event", event.ID, "has been found successfully"),
+		w)
+}
+
+func FindEvents(w http.ResponseWriter, r *http.Request) {
+	username, err := auth.GetUsername(r)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "Invalid Token")
+		return
+	}
+
+	q := r.URL.Query()
+	scode, ok := q["code"]
+	if !ok {
+		writeError(w, http.StatusBadRequest, "Invalid Request")
+		return
+	}
+
+	code := scode[0]
+
+	result := model.FindEvents(code, username)
+
+	var message string
+	if len(result) > 0 {
+		message = fmt.Sprint("Events for code", code, "have been found successfully")
+	} else {
+		message = fmt.Sprint("No Events found for code: ", code)
+	}
+
+	send(
+		map[string]interface{}{"events": result},
+		true,
+		message,
 		w)
 }
 
@@ -84,7 +116,7 @@ func NewEvent(w http.ResponseWriter, r *http.Request) {
 	send(
 		map[string]interface{}{"event": event},
 		true,
-		fmt.Sprintln("Event", event.Code, "has been created successfully"),
+		fmt.Sprint("Event", event.Code, "has been created successfully"),
 		w)
 }
 
